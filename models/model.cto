@@ -1,0 +1,85 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+namespace org.acme.drugwar
+
+enum Gender {
+o Male
+o Female
+o Other
+
+}
+
+abstract participant User identified by userId {
+ o String userId
+ o String firstName 
+ o String lastName
+ o String email
+}
+
+
+participant Doctor extends User {
+  o String medId
+  --> Patient[] assignedPatients
+  
+  
+}
+
+participant Patient extends User {
+  --> Prescription[] prescriptions
+  --> Doctor assignedDoctor optional
+  // add pres. history later
+}
+
+asset Prescription identified by prescriptionId{
+  o String prescriptionId
+  o Medication[] medications optional
+  --> Patient patient
+}
+
+asset Medication identified by medicationId {
+  o String medicationId
+  o String[] substances
+  --> Supplier supplier
+  o MedicationStatus status
+}
+
+enum MedicationStatus{
+  o NORMAL
+  o RECALL
+}
+participant Supplier identified by licenseId {
+  o String licenseId
+  --> Medication[] suppliedMedications
+  
+}
+
+transaction CreatePrescription {
+  o String prescriptionId default = "1"
+  --> Patient patient
+  --> Doctor doctor
+  --> Medication[] medications
+}
+
+transaction CreateMedication {
+	o String medicationId default = "1"
+  	--> Supplier supplier
+  	o String[] substances
+}
+  
+transaction AssignPatient {
+	--> Patient patient
+  	--> Doctor doctor
+}
+ 
